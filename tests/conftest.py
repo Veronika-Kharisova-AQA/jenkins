@@ -1,20 +1,27 @@
-from turtle import update
 
 import pytest
 from selene import browser
-from selene.support import webdriver
 from selenium.webdriver.chrome.options import Options
 
 from utils import attach
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def browser_setup():
-    browser.config.driver_name = 'chrome'
     browser.config.base_url = 'https://demoqa.com'
-    browser.config.window_width = '1280'
-    browser.config.window_height = '900'
-    browser.config.timeout = 6
+    options = Options()
+    selenoid_capabilities = {
+        "browserName": "chrome",
+        "browserVersion": "127.0",
+        "selenoid:options": {
+            "enableVNC": True,
+            "enableVideo": True,
+            "screenResolution": "1920x1080x24"
+        }
+    }
+    options.capabilities.update(selenoid_capabilities)
+    browser.config.driver_options = options
+    browser.config.driver_remote_url = 'https://user1:1234@selenoid.autotests.cloud/wd/hub'
 
     yield
     # ATTACHMENTS
